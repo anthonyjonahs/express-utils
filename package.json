@@ -1,11 +1,12 @@
 {
-  "name": "express-utils",
+  "name": "@belleza/express-utils",
   "version": "1.0.0",
   "description": "Some extra sauce for your express app.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "mocha --require ts-node/register --recursive src/**/*.test.ts",
-    "test:unit:watch": "mocha --require ts-node/register --watch-extensions ts --recursive --watch src/**/*.test.js",
+    "test:unit:watch": "mocha --require ts-node/register --watch-extensions ts --recursive --watch src/**/*.test.ts",
     "start": "node dist/app.js",
     "start:dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
     "build-ts": "tsc",
@@ -19,6 +20,11 @@
   ],
   "author": "Anthony Somos",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthonyjonahs/express-utils.git"
+  },
+  "homepage": "https://github.com/anthonyjonahs/express-utils",
   "dependencies": {
     "express": "^4.16.4",
     "lodash": "^4.17.11"
@@ -32,11 +38,14 @@
     "@types/sinon": "^7.0.5",
     "@types/sinon-chai": "^3.2.2",
     "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
     "concurrently": "^4.1.0",
     "jsdoc": "^3.5.5",
     "mocha": "^5.2.0",
+    "nock": "^10.0.6",
     "sinon": "^7.2.3",
     "sinon-chai": "^3.3.0",
+    "supertest": "^3.4.2",
     "ts-node": "^8.0.2",
     "typedoc": "^0.14.2",
     "typescript": "^3.2.4"
