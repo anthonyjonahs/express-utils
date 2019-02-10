@@ -1,6 +1,5 @@
 import express from 'express';
 import _ from 'lodash';
-import ApiError from './api-error';
 
 export type TMapRequestToArgs = string | string[] | ((req: express.Request) => any[]);
 
