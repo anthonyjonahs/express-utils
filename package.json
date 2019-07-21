@@ -1,11 +1,15 @@
 {
-  "name": "express-utils",
+  "name": "@belleza/express-utils",
   "version": "1.0.0",
   "description": "Some extra sauce for your express app.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "mocha --require ts-node/register --recursive src/**/*.test.ts",
-    "test:unit:watch": "mocha --require ts-node/register --watch-extensions ts --recursive --watch src/**/*.test.js",
+    "test:unit": "mocha --require ts-node/register --recursive src/**/*.unit.test.ts",
+    "test:unit:watch": "mocha --require ts-node/register --watch-extensions ts --recursive --watch src/**/*.unit.test.ts",
+    "test:integration": "mocha --require ts-node/register --recursive src/**/*.integration.test.ts",
+    "test:integration:watch": "mocha --require ts-node/register --watch-extensions ts --recursive --watch src/**/*.integration.test.ts",
     "start": "node dist/app.js",
     "start:dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
     "build-ts": "tsc",
@@ -19,26 +23,35 @@
   ],
   "author": "Anthony Somos",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthonyjonahs/express-utils.git"
+  },
+  "homepage": "https://github.com/anthonyjonahs/express-utils",
   "dependencies": {
-    "express": "^4.16.4",
-    "lodash": "^4.17.11"
+    "express": "^4.17.1",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/express": "^4.16.1",
-    "@types/joi": "^14.3.1",
-    "@types/lodash": "^4.14.120",
-    "@types/mocha": "^5.2.5",
-    "@types/sinon": "^7.0.5",
+    "@types/express": "^4.17.0",
+    "@types/joi": "^14.3.3",
+    "@types/lodash": "^4.14.136",
+    "@types/mocha": "^5.2.7",
+    "@types/sinon": "^7.0.13",
     "@types/sinon-chai": "^3.2.2",
+    "@types/supertest": "^2.0.8",
     "chai": "^4.2.0",
-    "concurrently": "^4.1.0",
-    "jsdoc": "^3.5.5",
+    "chai-http": "^4.3.0",
+    "concurrently": "^4.1.1",
+    "jsdoc": "^3.6.3",
     "mocha": "^5.2.0",
-    "sinon": "^7.2.3",
+    "nock": "^10.0.6",
+    "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0",
-    "ts-node": "^8.0.2",
+    "supertest": "^3.4.2",
+    "ts-node": "^8.3.0",
     "typedoc": "^0.14.2",
-    "typescript": "^3.2.4"
+    "typescript": "^3.5.3"
   }
 }

@@ -1,6 +1,5 @@
 import express from 'express';
 import _ from 'lodash';
-import ApiError from './api-error';
 
 export type TMapRequestToArgs = string | string[] | ((req: express.Request) => any[]);
 
@@ -40,30 +39,26 @@ export type TConnect = (mapRequestToArgs: TMapRequestToArgs, successStatus?: num
  * router.post('/images/search', connect(mapSearchToArgs, 203)(imageSearch));
  */
 
- export const connect: TConnect = (mapRequestToArgs, successStatus = 200) => controller => async (req, res) => {
+ export const connect: TConnect = (mapRequestToArgs, successStatus = 200) => controller => async (req, res, next) => {
   let args: any[] = [];
 
-  if (Array.isArray(mapRequestToArgs)) {
-    args = mapRequestToArgs.map(path => _.get(req, path.replace('req.', '')));
-  } else if (_.isFunction(mapRequestToArgs)) {
-    args = mapRequestToArgs(req);
-  } else if (_.isString(mapRequestToArgs)) {
-    const path = mapRequestToArgs.replace('req.', '');
-    args = [_.get(req, path)];
-  } else {
-    throw Error('mapRequestToArgs must be one of Function, Array, or String.')
-  }
-
   try {
+    if (Array.isArray(mapRequestToArgs)) {
+      args = mapRequestToArgs.map(path => _.get(req, path.replace('req.', '')));
+    } else if (_.isFunction(mapRequestToArgs)) {
+      args = mapRequestToArgs(req);
+    } else if (_.isString(mapRequestToArgs)) {
+      const path = mapRequestToArgs.replace('req.', '');
+      args = [_.get(req, path)];
+    } else {
+      throw Error('mapRequestToArgs must be one of Function, Array, or String.')
+    }
+
     const response = await controller(...args);
     _.isEmpty(response)
       ? res.sendStatus(successStatus)
       : res.status(successStatus).send(response)
   } catch (error) {
-    if (error instanceof ApiError) {
-      res.status(error.statusCode).send(error.message);
-    } else {
-      res.status(500).json(error);
-    }
+    next(error);
   }
 }

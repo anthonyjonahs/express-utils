@@ -5,14 +5,14 @@ import  chai from 'chai';
 import  _ from 'lodash';
 
 import { connect, TMapRequestToArgs } from './connect';
-import ApiError from './api-error';
 
 chai.use(sinonChai);
 const { expect } = chai;
 
 describe('connect', () => {
-  const req = express.request
-  const res = express.response
+  const req = express.request;
+  const res = express.response;
+  let next: sinon.SinonStub;
   let sandbox: sinon.SinonSandbox;
   let controller: sinon.SinonStub;
   let mapRequestToArgs: TMapRequestToArgs;
@@ -20,6 +20,7 @@ describe('connect', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     controller = sandbox.stub();
+    next = sandbox.stub();
     mapRequestToArgs = '';
     req.body = { id: 1234, name: 'samsung' };
     sandbox.stub(res, 'status').returns(res);
@@ -62,7 +63,7 @@ describe('connect', () => {
       expect(mapRequestToArgs).to.have.been.calledWith(req);
     });
     
-    it('should pass those args to the controller', async () => {
+    it('should pass correct args to the controller', async () => {
       await connect(mapRequestToArgs)(controller)(req, res, null);
       expect(controller).to.have.been.calledWith(1234, 'samsung');
 
@@ -80,7 +81,7 @@ describe('connect', () => {
       expect(_.get).to.have.been.calledWith(req, 'body.id');
     });
 
-    it('should pass those args to the controller', async () => {
+    it('should pass that arg to the controller', async () => {
       await connect(mapRequestToArgs)(controller)(req, res, null);
       expect(controller).to.have.been.calledWith(1234);
     });
@@ -92,11 +93,12 @@ describe('connect', () => {
     });
 
     it('should throw an error', async () => {
-      try {
-        await connect(mapRequestToArgs)(controller)(req, res, null);
-      } catch (error) {
-        expect(error.message).to.contain('mapRequestToArgs must be');
-      }
+        await connect(mapRequestToArgs)(controller)(req, res, next);
+        expect(next).to.be.called;
+        expect(next.firstCall.args[0])
+          .to.be.instanceOf(Error)
+          .with.property('message')
+          .that.contains('mapRequestToArgs must be one of');
     });
   });
 
@@ -123,31 +125,18 @@ describe('connect', () => {
     });
   });
   
-  context('controller throws an instance of ApiError', () => {
+  context('controller throws an error', () => {
     beforeEach(() => {
-      const apiError = new ApiError('connect.test.js');
-      controller.throws(apiError.forbidden('a custom message'));
+      controller.throws(new Error('a message'));
     })
     
-    it('should response with that ApiError', async () => {
-      await connect(mapRequestToArgs)(controller)(req, res, null);
-      expect(res.status).to.have.been.calledWith(403);
-      expect(res.send).to.have.been.calledWith('a custom message');
-    });
-  });
-  
-  context('controller throws an unknown error', () => {
-    let error: Error;
-
-    beforeEach(() => {
-      error = new Error('something unknown')
-      controller.throws(error);
-    })
-    
-    it('should respond with a 500 error', async () => {
-      await connect(mapRequestToArgs)(controller)(req, res, null);
-      expect(res.status).to.have.been.calledWith(500);
-      expect(res.json).to.have.been.calledWithExactly(error);
+    it('should call next with the error', async () => {
+      await connect(mapRequestToArgs)(controller)(req, res, next);
+      expect(next).to.have.been.called;
+      // expect(next.firstCall.args[0])
+      //   .to.be.an.instanceOf(Error)
+      //   .with.property('message')
+      //   .that.contains('a message')
     });
   });
 });
